@@ -89,9 +89,6 @@ const run = async () => {
 
     // await reportAttempt(track, { token, server, sheetid });
 
-    console.log(track);
-    console.log('Props', properties);
-
     const propsExists = await fileExists('./properties.json');
     console.log('Properties: ', propsExists);
 
