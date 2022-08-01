@@ -89,12 +89,9 @@ const run = async () => {
     const sheetid = core.getInput('sheetid');
     const properties = core.getInput('properties');
 
-    // await reportAttempt(track, { token, server, sheetid });
-
-    console.log(properties);
     const data = await fs.readFile(properties, 'utf8');
     props = JSON.parse(data);
-    console.log(props);
+    await reportAttempt(track, { token, server, sheetid });
 
     // Flag it if no tests ran at all
     if (countAllTests === 0) {
