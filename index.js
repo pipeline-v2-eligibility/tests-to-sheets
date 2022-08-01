@@ -3,7 +3,7 @@ const fileExists = require('fs.promises.exists');
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const axios = require('axios');
-// const properties = require('./properties.json');
+const props = require('./properties.json');
 
 let countAllTests = 0;
 
@@ -45,13 +45,14 @@ const reportAttempt = async (track, opts) => {
 
     const data = {
         repo,
-        owner,
+        name: props.name || owner,
+        owner: props.githubUsername || owner,
         ...stats,
         track,
         url: repository.url,
         source: 'pipeline-v2-eligibility',
         since: (new Date()).toUTCString(),
-        email: repository.owner.email || pusher.email
+        email: props.email || repository.owner.email || pusher.email
     };
 
     const apiHeaders = {
@@ -87,10 +88,7 @@ const run = async () => {
     const sheetid = core.getInput('sheetid');
     const track = core.getInput('track');
 
-    // await reportAttempt(track, { token, server, sheetid });
-
-    const propsExists = await fileExists('./properties.json');
-    console.log('Properties: ', propsExists);
+    await reportAttempt(track, { token, server, sheetid });
 
     // Flag it if no tests ran at all
     if (countAllTests === 0) {
