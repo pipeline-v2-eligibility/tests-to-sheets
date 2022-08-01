@@ -3,7 +3,7 @@ const fileExists = require('fs.promises.exists');
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const axios = require('axios');
-const properties = require('../../../properties.json');
+// const properties = require('./properties.json');
 
 let countAllTests = 0;
 
@@ -91,6 +91,9 @@ const run = async () => {
 
     console.log(track);
     console.log('Props', properties);
+
+    const propsExists = await fileExists('./properties.json');
+    console.log('Properties: ', propsExists);
 
     // Flag it if no tests ran at all
     if (countAllTests === 0) {
