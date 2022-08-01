@@ -3,8 +3,8 @@ const fileExists = require('fs.promises.exists');
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const axios = require('axios');
-const props = require('./properties.json');
 
+let props;
 let countAllTests = 0;
 
 const getStatsFor = async (track) => {
@@ -83,12 +83,18 @@ const reportAttempt = async (track, opts) => {
 
 const run = async () => {
   try {
+    const track = core.getInput('track');
     const token = core.getInput('token');
     const server = core.getInput('server');
     const sheetid = core.getInput('sheetid');
-    const track = core.getInput('track');
+    const properties = core.getInput('properties');
 
-    await reportAttempt(track, { token, server, sheetid });
+    // await reportAttempt(track, { token, server, sheetid });
+
+    console.log(properties);
+    const data = await fs.readFile(properties, 'utf8');
+    props = JSON.parse(data);
+    console.log(props);
 
     // Flag it if no tests ran at all
     if (countAllTests === 0) {

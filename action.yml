@@ -4,6 +4,9 @@ inputs:
   track:
     description: 'if this is a backend, frontend or cloud progamming challenge'
     required: true
+  properties:
+    description: 'file containing extra details about the project'
+    required: true
   server:  
     description: 'base API URL'
     required: true
