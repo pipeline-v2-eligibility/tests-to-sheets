@@ -1,7 +1,7 @@
 name: 'Report Jest Audit'
 description: 'report jest test stats for one or more coding challenges'
 inputs:
-  challenge:
+  track:
     description: 'if this is a backend, frontend or cloud progamming challenge'
     required: true
   server:  
