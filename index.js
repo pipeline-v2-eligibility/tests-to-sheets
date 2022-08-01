@@ -85,14 +85,19 @@ const reportAttempt = async (track, opts) => {
 
 const run = async () => {
   try {
+    const properties = core.getInput('properties');
+    const data = await fs.readFile(properties, 'utf8');
+    props = JSON.parse(data);
+
+    if (!props.email || props.email === '' || !props.githubUsername || props.githubUsername === '' || !props.apiBaseURL || props.apiBaseURL === '' ) {
+      core.setFailed('Please fill in the needed details into the properties.json file within your code repository');
+    }
+
     const track = core.getInput('track');
     const token = core.getInput('token');
     const server = core.getInput('server');
     const sheetid = core.getInput('sheetid');
-    const properties = core.getInput('properties');
 
-    const data = await fs.readFile(properties, 'utf8');
-    props = JSON.parse(data);
     await reportAttempt(track, { token, server, sheetid });
 
     // Flag it if no tests ran at all
