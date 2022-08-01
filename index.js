@@ -3,18 +3,18 @@ const fileExists = require('fs.promises.exists');
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const axios = require('axios');
-const properties = require(`${process.cwd()}/properties.json`);
+const properties = require('../../../properties.json');
 
 let countAllTests = 0;
 
-const getStatsFor = async (challenge) => {
-  const file = `${process.cwd()}/audits/${challenge}/${stats}.json`;
-  const reportExists = await fileExists(file);
+const getStatsFor = async (track) => {
+  const filePath = `${process.cwd()}/audits/${track}/${stats}.json`;
+  const reportExists = await fileExists(filePath);
 
   if (reportExists === true) {
     let stats = {};
 
-    const rawData = await fs.readFile(`${process.cwd()}/audits/${task}/${task}.json`, 'utf8');
+    const rawData = await fs.readFile(filePath, 'utf8');
     const payload = JSON.parse(rawData);
     const { numTotalTests, numPassedTests, numPendingTests} = payload;
 
@@ -31,36 +31,13 @@ const getStatsFor = async (challenge) => {
   
 };
 
-const alphabets = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-const shards = {
-    '0-4': 'A-E',
-    '5-9': 'F-J',
-    '10-14': 'K-O',
-    '15-19': 'P-T',
-    '20-25': 'U-Z'
-};
-
-const ownerToSheetPartition = (owner) => {
-    const initial = owner.charAt(0).toLowerCase();
-
-    let index = alphabets.indexOf(initial);
-    if (index === -1) index = 25;
-
-    const key = Object.keys(shards).find(k => {
-        const [start, end] = k.split('-');
-        return index >= parseInt(start, 10) && index <= parseInt(end, 10);
-    });
-
-    return shards[key];
-};
-
-const reportAChallenge = async (challenge, opts) => {
+const reportAttempt = async (track, opts) => {
     const { token, server, sheetid } = opts;
-    const stats = await getStatsFor(challenge);
+    const stats = await getStatsFor(track);
 
     const { repo, owner } = context.repo;
     const { repository, pusher } = context.payload;
-    const sheet = ownerToSheetPartition(owner);
+    const sheet = 'entries';
 
     // dont send data for skipped tests
     countAllTests += stats.tests;
@@ -70,7 +47,7 @@ const reportAChallenge = async (challenge, opts) => {
         repo,
         owner,
         ...stats,
-        challenge,
+        track,
         url: repository.url,
         source: 'pipeline-v2-eligibility',
         since: (new Date()).toUTCString(),
@@ -87,7 +64,7 @@ const reportAChallenge = async (challenge, opts) => {
         headers: apiHeaders
     });
 
-    const found = existing.results.find((e) => e.repo === repo && e.task === challenge);
+    const found = existing.results.find((e) => e.repo === repo && e.track === track);
     if (found) {
         // update the record and exit this function
         data.attempts = parseInt(found.attempts, 10) + 1;
@@ -108,10 +85,11 @@ const run = async () => {
     const token = core.getInput('token');
     const server = core.getInput('server');
     const sheetid = core.getInput('sheetid');
-    const challenge = core.getInput('challenge');
+    const track = core.getInput('track');
 
-    // await reportAChallenge(challenge, { token, server, sheetid });
+    // await reportAttempt(track, { token, server, sheetid });
 
+    console.log(track);
     console.log('Props', properties);
 
     // Flag it if no tests ran at all
