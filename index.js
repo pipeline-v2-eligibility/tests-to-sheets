@@ -35,6 +35,8 @@ const reportAttempt = async (track, opts) => {
     const { token, server, sheetid } = opts;
     const stats = await getStatsFor(track);
 
+    console.log('stats', stats);
+
     const { repo, owner } = context.repo;
     const { repository, pusher } = context.payload;
     const sheet = 'entries';
