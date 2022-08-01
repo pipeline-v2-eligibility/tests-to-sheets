@@ -8,7 +8,7 @@ let props;
 let countAllTests = 0;
 
 const getStatsFor = async (track) => {
-  const filePath = `${process.cwd()}/audits/${track}/${stats}.json`;
+  const filePath = `${process.cwd()}/audits/${track}/stats.json`;
   const reportExists = await fileExists(filePath);
 
   if (reportExists === true) {
