@@ -12,11 +12,15 @@ const getStatsFor = async (track) => {
   const filePath = `${process.cwd()}/audits/${track}/stats.json`;
   const reportExists = await fileExists(filePath);
 
+  console.log(track, filePath, `stats file exists: ${reportExists}`);
+
   if (reportExists === true) {
     let stats = {};
 
     const rawData = await fs.readFile(filePath, 'utf8');
     const payload = JSON.parse(rawData);
+
+    console.log(track, filePath);
 
     if (track === 'backend') {      // Jest tests
       const { numTotalTests, numPassedTests, numPendingTests} = payload;
@@ -27,13 +31,11 @@ const getStatsFor = async (track) => {
     }
     
     if (track === 'frontend') {     // Playwright tests
-      const { suites } = payload;
-
       stats.tests = 0;
       stats.passed = 0;
 
       const skipped = 0;
-      suites.forEach(({specs}) => {
+      payload.suites.forEach(({specs}) => {
         stats.tests += specs.length;
 
         const passed = 0;
@@ -49,6 +51,8 @@ const getStatsFor = async (track) => {
         stats.tests -= skipped;
       }
     }
+
+    console.log('stats', stats);
 
     return stats;
   }
