@@ -12,8 +12,6 @@ const getStatsFor = async (track) => {
   const filePath = `${process.cwd()}/audits/${track}/stats.json`;
   const reportExists = await fileExists(filePath);
 
-  console.log(track, filePath, `stats file exists: ${reportExists}`);
-
   if (reportExists === true) {
     let stats = {};
 
@@ -34,11 +32,11 @@ const getStatsFor = async (track) => {
       stats.tests = 0;
       stats.passed = 0;
 
-      const skipped = 0;
+      let skipped = 0;
       payload.suites.forEach(({specs}) => {
         stats.tests += specs.length;
 
-        const passed = 0;
+        let passed = 0;
         specs.forEach(s => {
           passed += s.tests.filter(t => t.status === "passed").length;
           skipped += s.tests.filter(t => t.status === "skipped").length;
