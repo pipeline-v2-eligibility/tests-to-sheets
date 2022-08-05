@@ -6,6 +6,7 @@ const axios = require('axios');
 
 let props;
 let countAllTests = 0;
+let skippedSome = false;
 
 const getStatsFor = async (track) => {
   const filePath = `${process.cwd()}/audits/${track}/stats.json`;
@@ -16,10 +17,38 @@ const getStatsFor = async (track) => {
 
     const rawData = await fs.readFile(filePath, 'utf8');
     const payload = JSON.parse(rawData);
-    const { numTotalTests, numPassedTests, numPendingTests} = payload;
 
-    stats.passed = numPassedTests;
-    stats.tests = numTotalTests - numPendingTests;
+    if (track === 'backend') {      // Jest tests
+      const { numTotalTests, numPassedTests, numPendingTests} = payload;
+
+      stats.passed = numPassedTests;
+      stats.tests = numTotalTests - numPendingTests;
+      skippedSome = numPendingTests >= 1 ? true : false;
+    }
+    
+    if (track === 'frontend') {     // Playwright tests
+      const { suites } = payload;
+
+      stats.tests = 0;
+      stats.passed = 0;
+
+      const skipped = 0;
+      suites.forEach(({specs}) => {
+        stats.tests += specs.length;
+
+        const passed = 0;
+        specs.forEach(s => {
+          passed += s.tests.filter(t => t.status === "passed").length;
+          skipped += s.tests.filter(t => t.status === "skipped").length;
+        });
+        stats.passed += passed;
+      });
+
+      if (skipped >= 1) {
+        skippedSome = true;
+        stats.tests -= skipped;
+      }
+    }
 
     return stats;
   }
@@ -87,7 +116,7 @@ const run = async () => {
     const data = await fs.readFile(properties, 'utf8');
     props = JSON.parse(data);
 
-    if (!props.email || props.email === '' || !props.githubUsername || props.githubUsername === '' || !props.apiBaseURL || props.apiBaseURL === '' ) {
+    if (!props.email || props.email === '' || !props.githubUsername || props.githubUsername === '' || !props.deployedAppURL || props.deployedAppURL === '' ) {
       core.setFailed('Please fill in the needed details into the properties.json file within your code repository');
     }
 
@@ -101,6 +130,10 @@ const run = async () => {
     // Flag it if no tests ran at all
     if (countAllTests === 0) {
       core.setFailed('This should not be happening! All tests were skipped!! Please review the instructions carefully!!!');
+    }
+
+    if (skippedSome === true) {
+      console.warn('It appears a number of tests were skipped. Pls carefully review the instructions to ensure all required tests for are app gets executed');
     }
 
   } catch (error) {
