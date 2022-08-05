@@ -18,8 +18,6 @@ const getStatsFor = async (track) => {
     const rawData = await fs.readFile(filePath, 'utf8');
     const payload = JSON.parse(rawData);
 
-    console.log(track, filePath);
-
     if (track === 'backend') {      // Jest tests
       const { numTotalTests, numPassedTests, numPendingTests} = payload;
 
@@ -49,8 +47,6 @@ const getStatsFor = async (track) => {
         stats.tests -= skipped;
       }
     }
-
-    console.log('stats', stats);
 
     return stats;
   }
