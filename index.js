@@ -38,8 +38,8 @@ const getStatsFor = async (track) => {
 
         let passed = 0;
         specs.forEach(s => {
-          passed += s.tests.filter(t => t.status === "passed").length;
-          skipped += s.tests.filter(t => t.status === "skipped").length;
+          passed += s.tests[0].results.filter(r => r.status === "passed").length;
+          skipped += s.tests[0].results.filter(r => r.status === "skipped").length;
         });
         stats.passed += passed;
       });
