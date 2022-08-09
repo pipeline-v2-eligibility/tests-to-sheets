@@ -18,7 +18,7 @@ const getStatsFor = async (track) => {
     const rawData = await fs.readFile(filePath, 'utf8');
     const payload = JSON.parse(rawData);
 
-    if (track === 'backend') {      // Jest tests
+    if (track === 'backend' || track === 'cloud') {      // Jest tests
       const { numTotalTests, numPassedTests, numPendingTests} = payload;
 
       stats.passed = numPassedTests;
@@ -26,7 +26,7 @@ const getStatsFor = async (track) => {
       skippedSome = numPendingTests >= 1 ? true : false;
     }
     
-    if (track === 'frontend') {     // Playwright tests
+    if (track === 'frontend') {                         // Playwright tests
       stats.tests = 0;
       stats.passed = 0;
 
