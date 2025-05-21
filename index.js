@@ -118,7 +118,6 @@ const run = async () => {
     
     const data = await fs.readFile(about, 'utf8');
     props = JSON.parse(data);
-    console.warn('Props', props);
 
     if (!props.email || props.email === '' || !props.githubUsername || props.githubUsername === '' || !props.deployedAppURL || props.deployedAppURL === '' ) {
       core.setFailed('Please fill in the needed details into the about.json file at the root your code repository');
