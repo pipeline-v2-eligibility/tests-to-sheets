@@ -1,10 +1,10 @@
 name: 'Report Jest Audit'
-description: 'report jest test stats for one or more coding challenges'
+description: 'report jest/vitest test stats for one or more coding challenges'
 inputs:
   track:
     description: 'if this is a backend, frontend or cloud progamming challenge'
     required: true
-  properties:
+  about:
     description: 'file containing extra details about the project'
     required: true
   server:  
@@ -17,5 +17,5 @@ inputs:
     description: 'Auth token for the API call'
     required: true
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

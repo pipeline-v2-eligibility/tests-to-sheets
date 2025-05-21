@@ -1,8 +1,8 @@
+const axios = require('axios');
 const fs = require('fs').promises;
-const fileExists = require('fs.promises.exists');
 const core = require('@actions/core');
 const { context } = require('@actions/github');
-const axios = require('axios');
+const fileExists = require('fs.promises.exists');
 
 let props;
 let countAllTests = 0;
@@ -18,7 +18,7 @@ const getStatsFor = async (track) => {
     const rawData = await fs.readFile(filePath, 'utf8');
     const payload = JSON.parse(rawData);
 
-    if (track === 'backend' || track === 'cloud') {      // Jest tests
+    if (track === 'backend' || track === 'cloud') {      // Jest/Vitest tests
       const { numTotalTests, numPassedTests, numPendingTests} = payload;
 
       stats.passed = numPassedTests;
@@ -110,12 +110,14 @@ const reportAttempt = async (track, opts) => {
 
 const run = async () => {
   try {
-    const properties = core.getInput('properties');
-    const data = await fs.readFile(properties, 'utf8');
+    const about = core.getInput('about');
+    const data = await fs.readFile(about, 'utf8');
     props = JSON.parse(data);
 
+    core.info(`About: ${JSON.stringify(props)}`);
+
     if (!props.email || props.email === '' || !props.githubUsername || props.githubUsername === '' || !props.deployedAppURL || props.deployedAppURL === '' ) {
-      core.setFailed('Please fill in the needed details into the properties.json file within your code repository');
+      core.setFailed('Please fill in the needed details into the about.json file at the root your code repository');
     }
 
     const track = core.getInput('track');
