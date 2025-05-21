@@ -62,6 +62,8 @@ const reportAttempt = async (track, opts) => {
     const { token, server, sheetid } = opts;
     const stats = await getStatsFor(track);
 
+    console.warn(`Stats for ${track} track: `, stats);
+
     const { repo, owner } = context.repo;
     const { repository, pusher } = context.payload;
     const sheet = 'entries';
@@ -140,7 +142,8 @@ const run = async () => {
     }
 
   } catch (error) {
-    core.setFailed(error.message);
+    // core.setFailed(error.message);
+    core.setFailed(error);
   }
 };
 
