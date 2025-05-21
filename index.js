@@ -111,10 +111,14 @@ const reportAttempt = async (track, opts) => {
 const run = async () => {
   try {
     const about = core.getInput('about');
+    const aboutFileExists = await fileExists(about);
+    if (aboutFileExists === false) {
+      core.setFailed('Please create an about.json file at the root of your code repository');
+    }
+    
     const data = await fs.readFile(about, 'utf8');
     props = JSON.parse(data);
-
-    core.info(`About: ${JSON.stringify(props)}`);
+    console.warn('Props', props);
 
     if (!props.email || props.email === '' || !props.githubUsername || props.githubUsername === '' || !props.deployedAppURL || props.deployedAppURL === '' ) {
       core.setFailed('Please fill in the needed details into the about.json file at the root your code repository');
