@@ -90,11 +90,15 @@ const reportAttempt = async (track, opts) => {
         "Content-Type": "application/json"
     };
 
-    const { data: existing } = await axios.get(`${server}/${sheet}?where={'repo':'${repo}'}`, {
-        headers: apiHeaders
+    const { data: existing } = await axios.get(`${server}/${sheet}`, {
+        headers: apiHeaders,
+        params: {
+          where: JSON.stringify({ repo })
+        }
     });
 
     const found = existing.results.find((e) => e.repo === repo && e.track === track);
+    console.warn('Existing', found && found.rowIndex, 'Data', data);
     if (found) {
         // update the record and exit this function
         data.attempts = parseInt(found.attempts, 10) + 1;
@@ -134,7 +138,7 @@ const run = async () => {
 
     // Flag it if no tests ran at all
     if (countAllTests === 0) {
-      core.setFailed('This should not be happening! All tests were skipped!! Please review the instructions carefully!!!');
+      core.setFailed('All tests were skipped!! Please review the instructions carefully!!!');
     }
 
     if (skippedSome === true) {
@@ -142,8 +146,12 @@ const run = async () => {
     }
 
   } catch (error) {
-    // core.setFailed(error.message);
+    core.setFailed(error.message);
     core.setFailed(error);
+    if (axios.isAxiosError(error)) {
+      const details = error.request ? error.request : error.response;
+      console.warn('Error details', details);
+    }
   }
 };
 
